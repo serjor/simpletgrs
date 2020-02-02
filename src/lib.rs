@@ -109,3 +109,21 @@ pub fn pin_chat_message(
 
     Ok(())
 }
+
+pub fn send_message(
+    text: &str,
+    token: &str,
+    group: &str,
+) -> Result<TelegramResponseMessage, Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::new();
+    let mut map = HashMap::new();
+    map.insert("chat_id", group);
+    map.insert("text", text);
+    map.insert("parse_mode", "HTML");
+    let url =
+        reqwest::Url::parse(&format!("https://api.telegram.org/bot{}/sendMessage", token)).unwrap();
+    let response = client.post(url).json(&map).send()?;
+    let message: TelegramResponseMessage = response.json()?;
+
+    Ok(message)
+}
